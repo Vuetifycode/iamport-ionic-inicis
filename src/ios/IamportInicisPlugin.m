@@ -23,10 +23,10 @@
         NSString* MY_APP_URL_KEY = [self.commandDelegate.settings objectForKey:[@"IamportAppScheme" lowercaseString]]; //ionic plugin 설치 시 설정한 scheme을 그대로 사용
 
         if( scheme !=  nil && [scheme hasPrefix:MY_APP_URL_KEY] ) {
-            //iOS의 경우 모바일 실시간계좌이체를 진행하였을 때 Bankpay에서 결제를 마친 후 Safari브라우저가 한 번 열렸다가 앱으로 복귀하게 됩니다. 
-            //이 때 복귀하는 url은 iamportionic://?imp_uid={imp_uid}&m_redirect_url={m_redirect_url} 로 앱이 호출되어 이쪽으로 들어옵니다. 
+            //iOS의 경우 모바일 실시간계좌이체를 진행하였을 때 Bankpay에서 결제를 마친 후 Safari브라우저가 한 번 열렸다가 앱으로 복귀하게 됩니다.
+            //이 때 복귀하는 url은 iamportionic://?imp_uid={imp_uid}&m_redirect_url={m_redirect_url} 로 앱이 호출되어 이쪽으로 들어옵니다.
             //때문에 다른 결제수단과의 일관성을 위해서는 m_redirect_url값을 활용해 다시 redirect처리해줘야합니다.
-            
+
             //imp_uid를 추출
             NSDictionary* query_map = [self parseQueryString:query];
             NSString* imp_uid = query_map[@"imp_uid"];
@@ -49,7 +49,7 @@
         [[UIApplication sharedApplication] openURL:request.URL];
         return NO;
     }
-    
+
     //ISP 호출하는 경우
     if([URLString hasPrefix:@"ispmobile://"]) {
         NSURL *appURL = [NSURL URLWithString:URLString];
@@ -60,13 +60,14 @@
             return NO;
         }
     }
-    
+
     //기타(금결원 실시간계좌이체 등)
     NSString *strHttp = @"http://";
     NSString *strHttps = @"https://";
+    NSString *strIonic = @"ionic://";
     NSString *strFiles = @"file://"; // index.html(local html file )
     NSString *reqUrl=[[request URL] absoluteString]; NSLog(@"webview 에 요청된 url==>%@",reqUrl);
-    if (!([reqUrl hasPrefix:strHttp]) && !([reqUrl hasPrefix:strHttps]) && !([reqUrl hasPrefix:strFiles])) {
+    if (!([reqUrl hasPrefix:strHttp]) && !([reqUrl hasPrefix:strHttps]) && !([reqUrl hasPrefix:strFiles]) && !([reqUrl hasPrefix:strIonic])) {
         [[UIApplication sharedApplication] openURL:[request URL]];
         return NO;
     }
@@ -102,12 +103,12 @@
 - (NSDictionary *)parseQueryString:(NSString *)query {
     NSMutableDictionary *dict = [[NSMutableDictionary alloc] initWithCapacity:6];
     NSArray *pairs = [query componentsSeparatedByString:@"&"];
-    
+
     for (NSString *pair in pairs) {
         NSArray *elements = [pair componentsSeparatedByString:@"="];
         NSString *key = [[elements objectAtIndex:0] stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
         NSString *val = [[elements objectAtIndex:1] stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
-        
+
         [dict setObject:val forKey:key];
     }
     return dict;
