@@ -15,7 +15,9 @@
 	module.exports = {
 		payment : function (user_code, param, callback) {
 			if( cordova.InAppBrowser ) {
-				var payment_url = 'iamport-checkout.html?user-code=' + user_code,
+                var file_path = param.file_path || ''
+
+                var payment_url = file_path + 'iamport-checkout.html?user-code=' + user_code,
 					m_redirect_url = 'http://localhost/iamport';
 
 				param.m_redirect_url = m_redirect_url;//강제로 변환
